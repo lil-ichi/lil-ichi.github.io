@@ -74,8 +74,8 @@ function initThemeAndSettings() {
       const active = await window.cyberAudio.toggle();
       audioBtn.classList.toggle('active', active);
       const label = audioBtn.querySelector('.hud-btn-label');
-      if (label) label.textContent = active ? 'AUDIO: ON' : 'AUDIO: OFF';
-      showCyberToast(`AUDIO ENGINE: [${active ? 'ONLINE (SYNTH ACTIVE)' : 'MUTED'}]`);
+      if (label) label.textContent = active ? 'CYBER SYNTH: ON' : 'CYBER SYNTH: OFF';
+      showCyberToast(`CYBER SOUNDTRACK: [${active ? 'ONLINE (118 BPM SYNTH ENGINE)' : 'MUTED'}]`);
     });
   }
 
