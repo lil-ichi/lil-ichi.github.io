@@ -70,12 +70,12 @@ function initThemeAndSettings() {
   // Audio Toggle Button in HUD
   const audioBtn = document.getElementById('hud-audio-btn');
   if (audioBtn) {
-    audioBtn.addEventListener('click', () => {
-      const active = window.cyberAudio.toggle();
+    audioBtn.addEventListener('click', async () => {
+      const active = await window.cyberAudio.toggle();
       audioBtn.classList.toggle('active', active);
-      audioBtn.querySelector('.hud-btn-label').textContent = active ? 'AUDIO: ON' : 'AUDIO: OFF';
-      if (active) window.cyberAudio.playSuccess();
-      showCyberToast(`AUDIO SYNTH: [${active ? 'ONLINE' : 'MUTED'}]`);
+      const label = audioBtn.querySelector('.hud-btn-label');
+      if (label) label.textContent = active ? 'AUDIO: ON' : 'AUDIO: OFF';
+      showCyberToast(`AUDIO ENGINE: [${active ? 'ONLINE (SYNTH ACTIVE)' : 'MUTED'}]`);
     });
   }
 
@@ -162,17 +162,21 @@ function init3DTilt() {
 }
 
 /**
- * Global Cyber Sound Hook
+ * Global Cyber Sound Hook (Event Delegation)
  */
 function initSoundListeners() {
-  // Buttons and Links
-  document.querySelectorAll('a, button, input, select, .cyber-interactive').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      if (window.cyberAudio) window.cyberAudio.playHover();
-    });
-    el.addEventListener('click', () => {
-      if (window.cyberAudio) window.cyberAudio.playClick();
-    });
+  document.addEventListener('mouseover', (e) => {
+    const target = e.target.closest('a, button, input, select, .cyber-repo-card, .contact-node-card, .skill-card, .cyber-chip, .cyber-btn-mini');
+    if (target && window.cyberAudio && window.cyberAudio.enabled) {
+      window.cyberAudio.playHover();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('a, button, input, select, .contact-node-card, .cyber-btn-mini, .lang-filter-btn');
+    if (target && window.cyberAudio && window.cyberAudio.enabled) {
+      window.cyberAudio.playClick();
+    }
   });
 }
 
