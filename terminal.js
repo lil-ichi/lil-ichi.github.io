@@ -274,13 +274,14 @@ class CyberTerminal {
 
   cmdStats() {
     const gh = window.githubConnector;
-    const repoCount = gh && gh.reposData ? gh.reposData.length : 4;
+    const repoCount = gh && gh.reposData ? gh.reposData.length : 3;
+    const starsCount = gh && gh.reposData ? gh.reposData.reduce((acc, r) => acc + (r.stargazers_count || 0), 0) : 0;
     this.print(`
 <div>
-  <span class="term-cyan">CORE LOAD:</span> 12.4% (Nominal)<br/>
+  <span class="term-cyan">NODE:</span> lil-ichi (itsrasoul)<br/>
   <span class="term-cyan">ACTIVE REPOSITORIES:</span> ${repoCount}<br/>
-  <span class="term-cyan">BANDWIDTH:</span> 1.2 Gbps Uplink<br/>
-  <span class="term-cyan">FIREWALL:</span> Quantum Encrypted (AES-512)
+  <span class="term-cyan">TOTAL STARS:</span> ${starsCount}<br/>
+  <span class="term-cyan">CLUSTER STATUS:</span> Synchronized with GitHub Core
 </div>`);
   }
 

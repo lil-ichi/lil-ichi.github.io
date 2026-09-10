@@ -1,7 +1,7 @@
 /**
  * Cyberpunk GitHub API Integration
- * Connects to GitHub REST API with offline fallback caching,
- * dynamic repo rendering, stats calculation, and telemetry stream.
+ * Pure live connection to GitHub REST API.
+ * Renders only genuine repositories, stats, and real telemetry events.
  */
 class GitHubConnector {
   constructor(defaultUsername = 'lil-ichi') {
@@ -9,25 +9,25 @@ class GitHubConnector {
     this.userData = null;
     this.reposData = [];
     this.eventsData = [];
-    this.storagePrefix = 'cyber_gh_';
+    this.storagePrefix = 'cyber_gh_live_';
   }
 
-  // Baked-in reliable fallback profile if rate-limited or offline
+  // Baseline fallback representation of user's real profile
   getFallbackProfile() {
     return {
       login: 'lil-ichi',
       name: 'itsrasoul',
       avatar_url: 'https://avatars.githubusercontent.com/u/298696641?v=4',
-      bio: 'Formerly @itsrasoul\nAI enthusiast · Builder · Curious human <><>)(<><>\nNeural Architect & Autonomous Multi-Agent Engineer',
-      public_repos: 2,
-      followers: 12,
+      bio: 'Formerly @itsrasoul\nAI enthusiast · Builder · Curious human <><>)(<><>\nNew account — courtesy of GitHub. 🫠',
+      public_repos: 3,
+      followers: 0,
       following: 11,
       html_url: 'https://github.com/lil-ichi',
       created_at: '2026-07-01T11:56:19Z'
     };
   }
 
-  // Baked-in fallback repositories
+  // Baseline real repositories only
   getFallbackRepos() {
     return [
       {
@@ -35,45 +35,35 @@ class GitHubConnector {
         description: 'Multi-channel market-data broadcasting & control center for TGJU (tgju.org): Telegram channels, WhatsApp & Bale delivery, Persian RTL dashboard, optional AI analysis — one FastAPI app.',
         html_url: 'https://github.com/lil-ichi/tgju-telegram-platform',
         language: 'Python',
-        stargazers_count: 5,
-        forks_count: 2,
-        topics: ['fastapi', 'market-data', 'telegram-bot', 'ai-analysis', 'fintech'],
+        stargazers_count: 0,
+        forks_count: 0,
+        topics: ['fastapi', 'market-data', 'telegram-bot', 'ai-analysis'],
         updated_at: '2026-09-09T12:00:10Z'
       },
       {
         name: 'lil-ichi',
-        description: 'Special Neural Architect & AI/ML Profile Terminal HUD with Autonomous Agent telemetry.',
+        description: 'Neural Architect & AI/ML Profile Configuration.',
         html_url: 'https://github.com/lil-ichi/lil-ichi',
         language: 'Markdown',
-        stargazers_count: 3,
+        stargazers_count: 0,
         forks_count: 0,
-        topics: ['profile', 'config', 'ai-agent', 'cyberpunk'],
+        topics: ['profile', 'config', 'ai-agent'],
         updated_at: '2026-09-10T16:00:57Z'
       },
       {
-        name: 'autonomous-agent-matrix',
-        description: 'Next-generation multi-agent coordination system with tool-augmented neural orchestration and self-reflection loops.',
-        html_url: 'https://github.com/lil-ichi',
-        language: 'Python',
-        stargazers_count: 14,
-        forks_count: 4,
-        topics: ['multi-agent', 'llm', 'deepmind', 'autonomous-ai'],
-        updated_at: '2026-09-08T18:22:00Z'
-      },
-      {
-        name: 'cyber-neural-hud',
-        description: 'Ultra-futuristic high-tech HUD portfolio interface with Web Audio synthesizer and WebGL/Canvas reactive visuals.',
-        html_url: 'https://github.com/lil-ichi',
-        language: 'JavaScript',
-        stargazers_count: 8,
-        forks_count: 1,
-        topics: ['cyberpunk', 'canvas', 'web-audio', 'frontend-matrix'],
-        updated_at: '2026-09-10T19:30:00Z'
+        name: 'lil-ichi.github.io',
+        description: 'Ultra-futuristic Cyberpunk / NetRunner HUD portfolio website connected directly to GitHub.',
+        html_url: 'https://github.com/lil-ichi/lil-ichi.github.io',
+        language: 'HTML',
+        stargazers_count: 0,
+        forks_count: 0,
+        topics: ['cyberpunk', 'portfolio', 'github-pages', 'web-audio'],
+        updated_at: '2026-09-10T19:35:00Z'
       }
     ];
   }
 
-  async fetchWithCache(url, cacheKey, ttlMs = 15 * 60 * 1000) {
+  async fetchWithCache(url, cacheKey, ttlMs = 5 * 60 * 1000) {
     const cached = localStorage.getItem(this.storagePrefix + cacheKey);
     const cachedTime = localStorage.getItem(this.storagePrefix + cacheKey + '_time');
 
@@ -104,6 +94,16 @@ class GitHubConnector {
   async loadAll(targetUser = this.username) {
     this.username = targetUser;
     
+    // Clear old outdated caches
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('cyber_gh_') && !key.startsWith('cyber_gh_live_')) {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch (e) {}
+
     // Fetch User Profile
     const profileData = await this.fetchWithCache(
       `https://api.github.com/users/${this.username}`,
@@ -111,23 +111,19 @@ class GitHubConnector {
     );
     this.userData = profileData || this.getFallbackProfile();
 
-    // Fetch Repositories
+    // Fetch Actual User Repositories
     const repos = await this.fetchWithCache(
-      `https://api.github.com/users/${this.username}/repos?sort=updated&per_page=30`,
+      `https://api.github.com/users/${this.username}/repos?sort=updated&per_page=50`,
       `repos_${this.username}`
     );
     
     if (repos && Array.isArray(repos) && repos.length > 0) {
-      // Merge with custom showcase repos if user has only 1-2 public repos
-      const fallbackList = this.getFallbackRepos();
-      const existingNames = new Set(repos.map(r => r.name.toLowerCase()));
-      const extraRepos = fallbackList.filter(r => !existingNames.has(r.name.toLowerCase()));
-      this.reposData = [...repos, ...extraRepos];
+      this.reposData = repos;
     } else {
       this.reposData = this.getFallbackRepos();
     }
 
-    // Fetch Events / Activity
+    // Fetch Real GitHub Events
     const events = await this.fetchWithCache(
       `https://api.github.com/users/${this.username}/events/public?per_page=15`,
       `events_${this.username}`
@@ -155,7 +151,7 @@ class GitHubConnector {
     if (avatarEl && this.userData.avatar_url) avatarEl.src = this.userData.avatar_url;
     if (nameEl) nameEl.textContent = this.userData.name || this.userData.login;
     if (handleEl) handleEl.textContent = `@${this.userData.login}`;
-    if (bioEl) bioEl.textContent = this.userData.bio || 'AI Engineer & Neural Architect';
+    if (bioEl) bioEl.textContent = this.userData.bio || 'AI enthusiast · Builder · Curious human';
     if (profileLinkEl) profileLinkEl.href = this.userData.html_url || `https://github.com/${this.userData.login}`;
   }
 
@@ -172,7 +168,9 @@ class GitHubConnector {
       totalForks += (r.forks_count || 0);
     });
 
-    if (totalReposEl) totalReposEl.textContent = this.reposData.length.toString().padStart(2, '0');
+    const repoCount = this.userData.public_repos !== undefined ? this.userData.public_repos : this.reposData.length;
+
+    if (totalReposEl) totalReposEl.textContent = repoCount.toString().padStart(2, '0');
     if (totalStarsEl) totalStarsEl.textContent = totalStars.toString().padStart(2, '0');
     if (totalForksEl) totalForksEl.textContent = totalForks.toString().padStart(2, '0');
     if (systemStatusEl) systemStatusEl.textContent = 'ONLINE // SECURE';
@@ -196,8 +194,8 @@ class GitHubConnector {
       const lang = repo.language || 'Code';
       const stars = repo.stargazers_count || 0;
       const forks = repo.forks_count || 0;
-      const desc = repo.description || 'Neural repository with automated multi-agent architecture.';
-      const topics = repo.topics || ['ai', 'agent', 'cyber'];
+      const desc = repo.description || 'Public GitHub repository.';
+      const topics = repo.topics && repo.topics.length > 0 ? repo.topics : [lang.toLowerCase()];
       const updatedDate = new Date(repo.updated_at || Date.now()).toLocaleDateString(undefined, {
         month: 'short',
         day: 'numeric',
@@ -256,13 +254,8 @@ class GitHubConnector {
       feed.innerHTML = `
         <div class="telemetry-item">
           <span class="telemetry-time">[LIVE]</span>
-          <span class="telemetry-type tag-push">HEARTBEAT</span>
-          <span class="telemetry-text">Neural agent sync active with GitHub Core Cluster.</span>
-        </div>
-        <div class="telemetry-item">
-          <span class="telemetry-time">[RECENT]</span>
-          <span class="telemetry-type tag-create">SYS_INIT</span>
-          <span class="telemetry-text">Multi-agent orchestrator listening on port 8080.</span>
+          <span class="telemetry-type tag-push">SYNCED</span>
+          <span class="telemetry-text">Node connected to GitHub cluster. Telemetry channel active for <strong class="cyber-cyan">@${this.username}</strong>.</span>
         </div>
       `;
       return;
@@ -270,7 +263,7 @@ class GitHubConnector {
 
     feed.innerHTML = this.eventsData.slice(0, 6).map(evt => {
       const type = evt.type.replace('Event', '').toUpperCase();
-      const repoName = evt.repo ? evt.repo.name : 'lil-ichi/repo';
+      const repoName = evt.repo ? evt.repo.name : `${this.username}/repo`;
       const timeStr = new Date(evt.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       let typeClass = 'tag-push';
       if (type === 'CREATE' || type === 'FORK') typeClass = 'tag-create';
@@ -280,7 +273,7 @@ class GitHubConnector {
         <div class="telemetry-item">
           <span class="telemetry-time">[${timeStr}]</span>
           <span class="telemetry-type ${typeClass}">${type}</span>
-          <span class="telemetry-text">Payload detected on <strong class="cyber-cyan">${repoName}</strong></span>
+          <span class="telemetry-text">Action recorded on <strong class="cyber-cyan">${repoName}</strong></span>
         </div>
       `;
     }).join('');
