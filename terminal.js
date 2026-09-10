@@ -53,6 +53,13 @@ class CyberTerminal {
       });
     }
 
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.isOpen) {
+        window.cyberAudio.playClick();
+        this.toggle(false);
+      }
+    });
+
     this.input.addEventListener('keydown', (e) => {
       window.cyberAudio.playKey();
 
