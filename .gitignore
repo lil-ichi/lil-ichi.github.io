@@ -1,0 +1,4 @@
+# Local standalone projects (maintained in their own dedicated GitHub repositories)
+projects/
+*.db
+.venv/
