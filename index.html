@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="neon">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lil-ichi // Cyberpunk Neural Portfolio & HUD</title>
+  <meta name="description" content="Dedicated high-tech Cyberpunk HUD portfolio for lil-ichi (@itsrasoul) — Neural Architect & Multi-Agent AI Engineer. Connected to GitHub.">
+  <meta name="theme-color" content="#08090d">
+
+  <!-- OpenGraph / Social Metadata -->
+  <meta property="og:title" content="lil-ichi // Cyberpunk Neural Portfolio">
+  <meta property="og:description" content="High-tech interactive HUD portfolio connected to GitHub with procedural audio synthesis & live telemetry.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://avatars.githubusercontent.com/u/298696641?v=4">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Interactive Background Canvas -->
+  <canvas id="cyber-bg-canvas"></canvas>
+
+  <!-- Visual Retro Overlays -->
+  <div class="scanline-overlay" id="scanline-overlay"></div>
+  <div class="crt-vignette"></div>
+
+  <!-- =========================================================================
+       TOP HUD STATUS BAR
+       ========================================================================= -->
+  <header class="cyber-hud-top">
+    <a href="#" class="hud-brand">
+      <svg class="hud-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+      <span>LIL-ICHI</span>
+      <span class="hud-tag">NODE://01</span>
+    </a>
+
+    <nav>
+      <ul class="hud-nav-links">
+        <li><a href="#hero">OVERVIEW</a></li>
+        <li><a href="#projects">DECK</a></li>
+        <li><a href="#skills">MATRIX</a></li>
+        <li><a href="#telemetry">TELEMETRY</a></li>
+        <li><a href="#contact">UPLINK</a></li>
+      </ul>
+    </nav>
+
+    <div class="hud-telemetry">
+      <div class="hud-metric">
+        <div class="hud-status-dot"></div>
+        <span class="cyber-cyan" id="hud-clock">00:00:00 LOC</span>
+      </div>
+
+      <div class="hud-metric">
+        <span class="cyber-muted">LATENCY:</span>
+        <span class="cyber-green" id="hud-ping">24 ms</span>
+      </div>
+
+      <!-- Synthesizer Audio Toggle -->
+      <button class="hud-action-btn" id="hud-audio-btn" title="Toggle Procedural Audio Synthesizer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <span class="hud-btn-label">AUDIO: OFF</span>
+      </button>
+
+      <!-- Terminal Open Trigger -->
+      <button class="hud-action-btn" id="toggle-terminal-btn" title="Open NetRunner CLI">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        <span>CLI</span>
+      </button>
+
+      <!-- Settings Trigger -->
+      <button class="hud-action-btn" id="open-settings-btn" title="HUD Configurations">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN WRAPPER
+       ========================================================================= -->
+  <main class="main-wrapper">
+
+    <!-- HERO SECTION -->
+    <section class="hero-grid" id="hero">
+      <div class="hero-content">
+        <div class="hero-status-ticker">
+          <span class="hud-status-dot"></span>
+          <span>SYSTEM ONLINE // RUNNING AUTONOMOUS AGENTS</span>
+        </div>
+
+        <h1 class="hero-title glitch-text" data-text="NEURAL ARCHITECT & BUILDER">
+          NEURAL ARCHITECT & BUILDER
+        </h1>
+
+        <p class="hero-subtitle">
+          Engineering high-precision multi-agent AI ecosystems, real-time market data infrastructure, and ultra-modern web interfaces.
+        </p>
+
+        <div class="hero-chips">
+          <span class="cyber-chip">#MULTI_AGENT_AI</span>
+          <span class="cyber-chip">#FASTAPI_BACKENDS</span>
+          <span class="cyber-chip">#PYTHON_ASYNC</span>
+          <span class="cyber-chip">#TELEGRAM_PLATFORMS</span>
+          <span class="cyber-chip">#FINTECH_DATA</span>
+        </div>
+
+        <div class="hero-buttons">
+          <a href="#projects" class="cyber-btn-primary">
+            <span>ACCESS REPOSITORIES</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <button class="cyber-btn-secondary" onclick="window.cyberTerminal.toggle(true)">
+            <span>INITIALIZE CLI</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D HOLO IDENTITY CARD -->
+      <div class="holo-card-container">
+        <div class="holo-card" data-tilt>
+          <div class="holo-corner-bracket top-left"></div>
+          <div class="holo-corner-bracket top-right"></div>
+          <div class="holo-corner-bracket bottom-left"></div>
+          <div class="holo-corner-bracket bottom-right"></div>
+
+          <div class="holo-header">
+            <span class="holo-id-badge">ID://SEC-8829 // LEVEL 5</span>
+            <span class="cyber-green font-mono" id="hud-system-status">SYNCING GITHUB...</span>
+          </div>
+
+          <div class="holo-avatar-wrap">
+            <div class="holo-avatar-frame">
+              <img src="https://avatars.githubusercontent.com/u/298696641?v=4" alt="lil-ichi Avatar" class="holo-avatar" id="gh-avatar">
+              <div class="holo-avatar-glow"></div>
+            </div>
+            <div>
+              <h2 class="holo-meta-name" id="gh-name">itsrasoul</h2>
+              <div class="holo-meta-handle" id="gh-handle">@lil-ichi</div>
+            </div>
+          </div>
+
+          <p class="holo-bio" id="gh-bio">
+            Formerly @itsrasoul — AI enthusiast · Builder · Curious human &lt;&gt;&lt;&gt;)(&lt;&gt;&lt;&gt;
+          </p>
+
+          <div class="holo-stats-grid">
+            <div class="holo-stat-box">
+              <div class="holo-stat-val" id="stat-repos-count">02</div>
+              <div class="holo-stat-lbl">REPOSITORIES</div>
+            </div>
+            <div class="holo-stat-box">
+              <div class="holo-stat-val" id="stat-stars-count">08</div>
+              <div class="holo-stat-lbl">TOTAL STARS</div>
+            </div>
+            <div class="holo-stat-box">
+              <div class="holo-stat-val" id="stat-forks-count">03</div>
+              <div class="holo-stat-lbl">FORKS</div>
+            </div>
+          </div>
+
+          <a href="https://github.com/lil-ichi" target="_blank" rel="noopener noreferrer" class="cyber-btn-primary" style="width: 100%; justify-content: center;" id="gh-profile-link">
+            <span>GITHUB CORE PROFILE</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         PROJECTS & REPOSITORIES (CYBER DECK)
+         ======================================================================= -->
+    <section class="cyber-section" id="projects">
+      <div class="section-header-wrap">
+        <h2 class="section-title">
+          <span class="cyber-cyan">//</span>
+          <span>CYBER DECK : REPOSITORIES</span>
+        </h2>
+        <span class="section-tag">LIVE GITHUB TELEMETRY</span>
+      </div>
+
+      <div class="repo-controls">
+        <div class="repo-search-box">
+          <input type="text" class="cyber-input" id="repo-search-input" placeholder="Query repositories, tags, descriptions...">
+        </div>
+
+        <div class="repo-filter-chips">
+          <button class="lang-filter-btn active" data-lang="all">ALL</button>
+          <button class="lang-filter-btn" data-lang="python">PYTHON</button>
+          <button class="lang-filter-btn" data-lang="javascript">JAVASCRIPT</button>
+          <button class="lang-filter-btn" data-lang="markdown">MARKDOWN</button>
+        </div>
+      </div>
+
+      <div class="repos-grid" id="repos-grid">
+        <!-- Injected dynamically by github-api.js -->
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         NEURAL CAPABILITIES & SKILL MATRIX
+         ======================================================================= -->
+    <section class="cyber-section" id="skills">
+      <div class="section-header-wrap">
+        <h2 class="section-title">
+          <span class="cyber-pink">//</span>
+          <span>NEURAL CAPABILITY MATRIX</span>
+        </h2>
+        <span class="section-tag">POWER EFFICIENCY GRID</span>
+      </div>
+
+      <div class="skills-grid">
+        <div class="skill-card">
+          <div class="skill-header">
+            <span class="skill-title">Autonomous Multi-Agent AI</span>
+            <span class="skill-level">98%</span>
+          </div>
+          <div class="skill-bar-wrap">
+            <div class="skill-bar-fill" style="width: 98%;"></div>
+          </div>
+          <p class="skill-desc">Tool augmentation, hierarchical swarms, self-reflection loops, and LLM orchestration.</p>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-header">
+            <span class="skill-title">Python / FastAPI Systems</span>
+            <span class="skill-level">95%</span>
+          </div>
+          <div class="skill-bar-wrap">
+            <div class="skill-bar-fill" style="width: 95%;"></div>
+          </div>
+          <p class="skill-desc">High-throughput asynchronous backends, websockets, REST APIs, and microservice architectures.</p>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-header">
+            <span class="skill-title">Market Data & Broadcasting</span>
+            <span class="skill-level">92%</span>
+          </div>
+          <div class="skill-bar-wrap">
+            <div class="skill-bar-fill" style="width: 92%;"></div>
+          </div>
+          <p class="skill-desc">Multi-channel delivery (Telegram, WhatsApp, Bale), real-time pricing feeds, and analytics.</p>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-header">
+            <span class="skill-title">Modern Web & Canvas Engine</span>
+            <span class="skill-level">90%</span>
+          </div>
+          <div class="skill-bar-wrap">
+            <div class="skill-bar-fill" style="width: 90%;"></div>
+          </div>
+          <p class="skill-desc">Futuristic responsive UI/UX, Web Audio API synthesis, WebGL/Canvas, and CSS custom properties.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         LIVE TELEMETRY & ACTIVITY STREAM
+         ======================================================================= -->
+    <section class="cyber-section" id="telemetry">
+      <div class="section-header-wrap">
+        <h2 class="section-title">
+          <span class="cyber-cyan">//</span>
+          <span>CLUSTER TELEMETRY STREAM</span>
+        </h2>
+        <span class="section-tag">LIVE GITHUB EVENTS</span>
+      </div>
+
+      <div class="telemetry-container" id="telemetry-feed">
+        <!-- Populated dynamically by github-api.js -->
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         TRANSMISSION UPLINK (CONTACT)
+         ======================================================================= -->
+    <section class="cyber-section" id="contact">
+      <div class="section-header-wrap">
+        <h2 class="section-title">
+          <span class="cyber-pink">//</span>
+          <span>TRANSMISSION COMM-LINK</span>
+        </h2>
+        <span class="section-tag">ENCRYPTED CHANNEL</span>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-info-panel">
+          <div class="contact-node-card" data-copy="https://github.com/lil-ichi" title="Click to copy GitHub URL">
+            <div>
+              <div class="node-label">GITHUB REPOSITORY NETWORK</div>
+              <div class="node-val">github.com/lil-ichi</div>
+            </div>
+            <span class="cyber-chip">COPY LINK</span>
+          </div>
+
+          <div class="contact-node-card" data-copy="lil-ichi" title="Click to copy handle">
+            <div>
+              <div class="node-label">IDENTITY HANDLE</div>
+              <div class="node-val">@lil-ichi (itsrasoul)</div>
+            </div>
+            <span class="cyber-chip">COPY HANDLE</span>
+          </div>
+
+          <div class="contact-node-card" data-copy="AGENTIC_COLLABORATION_READY" title="Status code">
+            <div>
+              <div class="node-label">AVAILABILITY DIRECTIVE</div>
+              <div class="node-val">OPEN TO VENTURES & AI RESEARCH</div>
+            </div>
+            <span class="cyber-chip">STATUS: OK</span>
+          </div>
+        </div>
+
+        <div class="contact-form-panel">
+          <form id="uplink-form">
+            <div class="form-group">
+              <label class="form-label" for="comm-sender">CALLSIGN / SENDER IDENTIFIER</label>
+              <input type="text" id="comm-sender" class="cyber-input" placeholder="e.g. Neo or recruiter@tech.io" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="comm-payload">TRANSMISSION PAYLOAD</label>
+              <textarea id="comm-payload" class="cyber-input" placeholder="Enter encrypted transmission message..." required></textarea>
+            </div>
+
+            <button type="submit" class="cyber-btn-primary" style="width: 100%; justify-content: center;">
+              <span>DISPATCH TRANSMISSION</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       FOOTER
+       ========================================================================= -->
+  <footer class="cyber-footer">
+    <div class="footer-decor">// TERMINAL PROTOCOL 2026 // NODE LIL-ICHI //</div>
+    <p>Designed & engineered with autonomous intelligence. Hosted seamlessly via GitHub Pages.</p>
+  </footer>
+
+  <!-- =========================================================================
+       INTERACTIVE NETRUNNER CLI TERMINAL
+       ========================================================================= -->
+  <div class="cyber-terminal-modal" id="terminal-container">
+    <div class="terminal-header">
+      <div class="terminal-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+        <span>NETRUNNER ZSH // lil-ichi@neural-core</span>
+      </div>
+      <div class="terminal-controls">
+        <button class="term-btn min" title="Minimize" onclick="window.cyberTerminal.toggle(false)"></button>
+        <button class="term-btn close" id="close-terminal-btn" title="Close"></button>
+      </div>
+    </div>
+
+    <div class="terminal-output" id="terminal-output">
+      <div class="term-line">
+        <span class="term-cyan">NEURAL SYSTEM KERNEL v2.0</span> — Initialized for <span class="term-highlight">@lil-ichi</span>.
+      </div>
+      <div class="term-line term-dim">
+        Type <span class="term-highlight">help</span> for available commands, <span class="term-highlight">neofetch</span> for specs, or <span class="term-highlight">repos</span> for project deck.
+      </div>
+    </div>
+
+    <div class="terminal-input-bar">
+      <span class="term-input-prompt">&gt;</span>
+      <input type="text" class="terminal-input" id="terminal-input" placeholder="Type a command (e.g. help, neofetch, theme matrix)..." autofocus autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       SETTINGS & CONFIGURATION MODAL
+       ========================================================================= -->
+  <div class="settings-modal-backdrop" id="settings-modal">
+    <div class="settings-dialog">
+      <div class="settings-header">
+        <h3 class="font-heading cyber-cyan">// HUD CONFIGURATION</h3>
+        <button class="hud-action-btn" id="close-settings-btn">CLOSE [X]</button>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-label-title">Theme Palette</div>
+          <div class="settings-label-desc">Select cyber chromatic signature</div>
+        </div>
+        <div>
+          <select id="theme-select" class="cyber-input" style="padding: 6px 10px; width: 140px;">
+            <option value="neon">NEON (CYBER)</option>
+            <option value="matrix">MATRIX (GREEN)</option>
+            <option value="synth">SYNTHWAVE</option>
+            <option value="stealth">STEALTH (VOID)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-label-title">CRT Scanlines & Flicker</div>
+          <div class="settings-label-desc">Toggle retro cathode ray tube lines</div>
+        </div>
+        <div>
+          <label class="cyber-switch">
+            <input type="checkbox" id="toggle-scanlines" checked>
+            <span class="cyber-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-label-title">Digital Matrix Rain</div>
+          <div class="settings-label-desc">Switch background canvas to Matrix stream</div>
+        </div>
+        <div>
+          <label class="cyber-switch">
+            <input type="checkbox" id="toggle-matrix">
+            <span class="cyber-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-row" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+        <div class="settings-label-title">GitHub Node Switcher</div>
+        <div class="settings-label-desc">Preview telemetry for any public GitHub handle</div>
+        <div style="display: flex; gap: 8px; width: 100%;">
+          <input type="text" id="custom-gh-user-input" class="cyber-input" placeholder="e.g. lil-ichi" value="lil-ichi">
+          <button class="cyber-btn-mini" id="btn-apply-custom-user">SYNC NODE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="cyber-toast-container"></div>
+
+  <!-- Application Scripts -->
+  <script src="audio.js"></script>
+  <script src="canvas.js"></script>
+  <script src="github-api.js"></script>
+  <script src="terminal.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
